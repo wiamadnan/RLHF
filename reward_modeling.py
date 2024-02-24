@@ -33,7 +33,14 @@ model = AutoModelForSequenceClassification.from_pretrained(
 #-------- Dataset --------#
 raw_datasets = load_dataset("Anthropic/hh-rlhf")
 # Tokenize chosen/rejected pairs of inputs
-# Adapt this section to your needs for custom datasets
+
+train_dataset = raw_datasets["train"]
+
+# Reduce the size of the dataset to 5%
+small_train_dataset = train_dataset.shuffle(seed=42).select(
+    range(int(0.05 * len(train_dataset)))
+)
+
 
 def preprocess_function(examples):
     new_examples = {
@@ -53,25 +60,50 @@ def preprocess_function(examples):
 
     return new_examples
 
-# Preprocess the dataset and filter out examples that are longer than args.max_length
-raw_datasets = raw_datasets.map(
+# # Preprocess the dataset and filter out examples that are longer than args.max_length
+# raw_datasets = raw_datasets.map(
+#     preprocess_function,
+#     batched=True,
+#     num_proc=4,
+# )
+# raw_datasets = raw_datasets.filter(
+#     lambda x: len(x["input_ids_chosen"]) <= reward_config.max_length
+#     and len(x["input_ids_rejected"]) <= reward_config.max_length
+# )
+# train_dataset = raw_datasets["train"]
+# eval_dataset = raw_datasets["test"]
+
+small_train_dataset = small_train_dataset.map(
     preprocess_function,
     batched=True,
     num_proc=4,
 )
-raw_datasets = raw_datasets.filter(
+
+# Filter out examples that are longer than reward_config.max_length for the training dataset
+small_train_dataset = small_train_dataset.filter(
     lambda x: len(x["input_ids_chosen"]) <= reward_config.max_length
     and len(x["input_ids_rejected"]) <= reward_config.max_length
 )
-train_dataset = raw_datasets["train"]
-eval_dataset = raw_datasets["test"]
+
+# Similarly, preprocess the validation dataset
+eval_dataset = raw_datasets["test"].map(
+    preprocess_function,
+    batched=True,
+    num_proc=4,
+)
+
+# Filter out examples that are longer than reward_config.max_length for the validation dataset
+eval_dataset = eval_dataset.filter(
+    lambda x: len(x["input_ids_chosen"]) <= reward_config.max_length
+    and len(x["input_ids_rejected"]) <= reward_config.max_length
+)
 
 #-------- Training --------#
 trainer = RewardTrainer(
     model=model,
     tokenizer=tokenizer,
     args=reward_config,
-    train_dataset=train_dataset,
+    train_dataset=small_train_dataset,
     eval_dataset=eval_dataset,
     peft_config=get_peft_config(model_config),
 )
