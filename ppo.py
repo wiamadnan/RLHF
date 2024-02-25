@@ -1,5 +1,17 @@
 """
-python ppo.py --exp_name ppo --seed 0 --log_with wandb --model_name gpt2 --query_dataset wentingzhao/anthropic-hh-first-prompt --reward_model ./reward_modeling_anthropic_hh --lora_alpha 16 --lora_r 16 --use_seq2seq False --trust_remote_code False --use_peft False --ppo_epochs 8
+python ppo.py \
+    --exp_name="ppo" \
+    --seed=0 \
+    --log_with="wandb" \
+    --model_name="gpt2" \
+    --query_dataset="wentingzhao/anthropic-hh-first-prompt" \
+    --reward_model="./reward_modeling_anthropic_hh" \
+    --lora_alpha=16 \
+    --lora_r=16 \
+    --use_seq2seq=False \
+    --trust_remote_code=False \
+    --use_peft=False \
+    --ppo_epochs=8
 """
 from dataclasses import dataclass, field
 from typing import Optional
