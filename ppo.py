@@ -108,18 +108,16 @@ tokenizer.pad_token_id = tokenizer.eos_token_id
 # We then build the PPOTrainer, passing the model, the reference model, the tokenizer
 ppo_trainer = PPOTrainer(ppo_config, model, ref_model, tokenizer, dataset=dataset, data_collator=collator)
 
-# We then build the reward pipeline, passing the model name and the
-# rewardine arguments. 
+# We then build the reward pipeline, passing the model name and the rewardine arguments. 
 device = ppo_trainer.accelerator.device
 if ppo_trainer.accelerator.num_processes == 1:
     device = 0 if torch.cuda.is_available() else "cpu" 
-
-ds_plugin = ppo_trainer.accelerator.state.deepspeed_plugin
 
 #-------- Reward Model & Tokenizer --------#
 reward_model = AutoModelForSequenceClassification.from_pretrained(ppo_config.reward_model)
 reward_tokenizer = AutoTokenizer.from_pretrained(ppo_config.reward_model)
 
+ds_plugin = ppo_trainer.accelerator.state.deepspeed_plugin
 if ds_plugin is not None and ds_plugin.is_zero3_init_enabled():
     with ds_plugin.zero3_init_context_manager(enable=False):
         classif_pipe = pipeline("text-classification", model=reward_model, tokenizer=reward_tokenizer, device=device)
