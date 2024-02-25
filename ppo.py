@@ -179,6 +179,5 @@ for _epoch, batch in tqdm(enumerate(ppo_trainer.dataloader)):
     stats = ppo_trainer.step(query_tensors, response_tensors, rewards)
     ppo_trainer.log_stats(stats, batch, rewards, columns_to_log=["query", "response", "ref_response", "ref_rewards"])
 
-# model.save_pretrained('./policy_anthropic_hh/model')
-# tokenizer.save_pretrained('./policy_anthropic_hh/tokenizer')
+ppo_trainer.save_model('./policy_anthropic_hh/model')
 

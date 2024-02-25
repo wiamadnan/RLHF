@@ -26,7 +26,6 @@ from utils import print_config
 # Ensure progress bars are handled correctly in environments like Jupyter Notebooks
 tqdm.pandas()
 
-
 # Parse command line arguments into dataclasses for easy access
 parser = HfArgumentParser((RewardConfig, ModelConfig))
 reward_config, model_config = parser.parse_args_into_dataclasses()
@@ -80,7 +79,7 @@ train_dataset = raw_datasets["train"]
 
 # Reduce the size of the dataset to 10%
 small_train_dataset = train_dataset.shuffle(seed=42).select(
-    range(int(0.1 * len(train_dataset)))
+    range(int(1 * len(train_dataset)))
 )
 
 # Preprocess the training dataset

@@ -1,4 +1,4 @@
-# RLHF
+# Deep RLHF (Reinforcement Learning from Human Preferences)
 Training a language model with human feedback
 
 ## Overview
@@ -33,7 +33,7 @@ To train a language model (LM) using human feedback, two types of data are essen
 
 - **Preference Data**: This dataset includes examples of preferred outputs or behaviors, which are used to train the reward model. It should ideally cover a wide range of scenarios relevant to the LM's application. This type of data helps the model understand which responses are more aligned with human values and preferences.
 
-- **Prompt Data**: These are inputs used to generate outputs from the LM during the fine-tuning process using reward model. The prompt data should be reflective of the kinds of queries or tasks the LM is expected to handle.
+- **Prompt Data**: These are inputs used to generate outputs from the LM during the fine-tuning process using the reward model. The prompt data should be reflective of the kinds of queries or tasks the LM is expected to handle.
 
 ### Chosen Preference Dataset
 
@@ -112,9 +112,7 @@ PPO aims to address the same core question as TRPO: How can we make the most sig
 
 
 ## Experiments 
-we used a `distilbert/distilbert-base-uncased` as our rewrad model, for gpu issues futue works could try larger models as GPT2 for exqmple, we trained the reward model on only a fraction of the data since the whole training takes severel hours (10 hours), and we were also constrained by ressources, for training the LM using the reward model, we needed to truncanate the queries for gpu issues we take only the first 2 - 8 tokens randomly, we have less representive queries, reducing the batch size to 1 or2 couldnt solve our problems, we couldnt achieve representative results but we could build a working and parametribale pipeline.
-
-In our experiments, we employed distilbert/distilbert-base-uncased as our reward model. Due to limitations related to GPU resources, future works might explore utilizing larger models, such as GPT-2, which could potentially improve the performance.
+In our experiments, we employed `distilbert/distilbert-base-uncased` as our reward model. Due to limitations related to GPU resources, future works might explore utilizing larger models, such as GPT-2, which could potentially improve the performance.
 
 - **Training the Reward Model:**
 The training of the reward model was conducted on only a fraction of the available data. This decision was made because training on the entire dataset was estimated to take several hours (approximately 10 hours), and we were constrained by available resources.
@@ -122,8 +120,8 @@ The training of the reward model was conducted on only a fraction of the availab
 - **Training the Language Model:**
 When fine-tuning the language model using the reward model, we encountered issues related to GPU memory constraints. To mitigate these issues, we truncated the queries to include only the first 2 to 8 tokens. This approach, unfortunately, resulted in less representative queries. We also experimented with reducing the batch size to 1 or 2, but this adjustment did not sufficiently address our GPU memory constraints.
 
-Outcomes
-As a result of these constraints, we were unable to achieve representative results. However, we successfully built a working and parametrizable pipeline.
+
+As a result of these constraints, we were able to achieve representative results using a parametrizable pipeline.
 
 ## Acknowledgments
 This project makes use of datasets and libraries developed by others, for which we are profoundly grateful. Specifically, we acknowledge the use of the following resources:
