@@ -112,9 +112,11 @@ ppo_trainer = PPOTrainer(ppo_config, model, ref_model, tokenizer, dataset=datase
 # rewardine arguments. 
 device = ppo_trainer.accelerator.device
 if ppo_trainer.accelerator.num_processes == 1:
-    device = 0 if torch.cuda.is_available() else "cpu"  # to avoid a `pipeline` bug
+    device = 0 if torch.cuda.is_available() else "cpu" 
 
 ds_plugin = ppo_trainer.accelerator.state.deepspeed_plugin
+
+#-------- Reward Model & Tokenizer --------#
 reward_model = AutoModelForSequenceClassification.from_pretrained(ppo_config.reward_model)
 reward_tokenizer = AutoTokenizer.from_pretrained(ppo_config.reward_model)
 
@@ -131,6 +133,7 @@ if classif_pipe.tokenizer.pad_token_id is None:
 if classif_pipe.model.config.pad_token_id is None:
     classif_pipe.model.config.pad_token_id = tokenizer.pad_token_id
 
+#-------- Training --------#
 # We then define the arguments to pass to the `generate` function. These arguments
 # are passed to the `generate` function of the PPOTrainer, which is a wrapper around
 # the `generate` function of the trained model.
@@ -143,9 +146,7 @@ generation_kwargs = {
     "max_new_tokens": 32,
 }
 
-#-------- Training --------#
 for _epoch, batch in tqdm(enumerate(ppo_trainer.dataloader)):
-    print(_epoch)
     query_tensors = batch["input_ids"]
 
     # Get response from gpt2
@@ -168,6 +169,6 @@ for _epoch, batch in tqdm(enumerate(ppo_trainer.dataloader)):
     stats = ppo_trainer.step(query_tensors, response_tensors, rewards)
     ppo_trainer.log_stats(stats, batch, rewards, columns_to_log=["query", "response", "ref_response", "ref_rewards"])
 
-model.save_pretrained('./policy_anthropic_hh/model')
-tokenizer.save_pretrained('./policy_anthropic_hh/tokenizer')
+# model.save_pretrained('./policy_anthropic_hh/model')
+# tokenizer.save_pretrained('./policy_anthropic_hh/tokenizer')
 
