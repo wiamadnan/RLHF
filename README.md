@@ -22,10 +22,10 @@ This project implements "Deep Reinforcement Learning from Human Preferences"[(Ch
     git clone https://github.com/wiamadnan/RLHF.git
 ```
 
-2. Install the required dependencies:
+<!-- 2. Install the required dependencies:
 ```bash
     pip install -r requirements.txt
-```
+``` -->
 
 ## Dataset
 
